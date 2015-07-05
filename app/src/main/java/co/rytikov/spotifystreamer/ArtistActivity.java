@@ -14,12 +14,11 @@ public class ArtistActivity extends ActionBarActivity {
         setContentView(R.layout.activity_artist);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_artist, menu);
-        return true;
+        return false;
     }
 
     @Override
@@ -30,9 +29,9 @@ public class ArtistActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+        // if (id == R.id.action_settings) {
+        //    return true;
+        // }
 
         return super.onOptionsItemSelected(item);
     }
