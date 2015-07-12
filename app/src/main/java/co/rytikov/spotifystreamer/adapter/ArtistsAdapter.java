@@ -1,8 +1,6 @@
 package co.rytikov.spotifystreamer.adapter;
 
 import android.content.Context;
-import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,49 +10,41 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import co.rytikov.spotifystreamer.R;
-import kaaes.spotify.webapi.android.models.Artist;
-import kaaes.spotify.webapi.android.models.Artists;
-import kaaes.spotify.webapi.android.models.Pager;
+import co.rytikov.spotifystreamer.models.Artiste;
 
 public class ArtistsAdapter extends ArrayAdapter {
-     
-    public List<Artist> list;
-    private Artist artist;
+
+    public ArrayList<Artiste> list;
+    private Artiste artiste;
     private Context context;
 
-    public ArtistsAdapter(Context context, int resource, List<Artist> artists) {
-        super(context, resource, (List) artists);
+    public ArtistsAdapter(Context context, int resource, ArrayList<Artiste> artistes) {
+        super(context, resource, (List) artistes);
         this.context = context;
-        list = artists;
+        list = artistes;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        artist = list.get(position);
+        artiste = list.get(position);
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_artist, parent, false);
         }
-
-        String url = null;
-        if (artist.images.size() > 0) {
-            if (artist.images.get(0).url != null) {
-                url = artist.images.get(0).url;
+        ImageView image = (ImageView) convertView.findViewById(R.id.ArtistImage);
+        if (artiste.images.size() > 0) {
+            if (artiste.images.get(0).url != null) {
+                Picasso.with(this.context).load(artiste.images.get(0).url).into(image);
             }
         }
-        else {
-            Log.d("artist_img", "error getting image url");
-        }
-
-        ImageView image = (ImageView) convertView.findViewById(R.id.ArtistImage);
-        Picasso.with(this.context).load(url).error(R.drawable.ic_album_black).into(image);
 
         TextView versionNameView = (TextView) convertView.findViewById(R.id.ArtistName);
-        versionNameView.setText(artist.name);
+        versionNameView.setText(artiste.name);
 
         return convertView;
     }

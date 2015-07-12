@@ -1,5 +1,10 @@
 package co.rytikov.spotifystreamer;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,20 +13,43 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
-import java.util.List;
+import android.widget.Toast;
 
+import java.util.ArrayList;
+
+import co.rytikov.spotifystreamer.models.Artiste;
 import co.rytikov.spotifystreamer.adapter.ArtistsAdapter;
+import kaaes.spotify.webapi.android.SpotifyApi;
+import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
-
+import kaaes.spotify.webapi.android.models.ArtistsPager;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ArtistActivityFragment extends Fragment implements AsyncArtistCallback {
+public class ArtistActivityFragment extends Fragment {
 
     private View mainView;
+    private SearchView artistSearch;
     private ArtistsAdapter artistsAdapter;
-    public ArtistActivityFragment() {
+    private ArrayList<Artiste> artistes;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null ) {
+            artistes = savedInstanceState.getParcelableArrayList("the_artistes");
+        }
+        else {
+            artistes = new ArrayList<>();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("the_artistes", artistes);
     }
 
     @Override
@@ -29,15 +57,20 @@ public class ArtistActivityFragment extends Fragment implements AsyncArtistCallb
 
         View view = inflater.inflate(R.layout.fragment_artist, container, false);
         mainView = view;
-        SearchView artistSearch = (SearchView) view.findViewById(R.id.artistSearch);
+        artistSearch = (SearchView) view.findViewById(R.id.artistSearch);
 
-        final ArtistActivityFragment that = this;
+        if (artistes.size() != 0) {
+            onComplete();
+        }
 
         artistSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                SearchArtistTask getArtist = new SearchArtistTask( that );
-                getArtist.execute(query);
+                if (isConnected()) {
+                    SearchArtistTask getArtist = new SearchArtistTask();
+                    getArtist.execute(query);
+                }
+                artistSearch.clearFocus();
                 return false;
             }
 
@@ -50,9 +83,14 @@ public class ArtistActivityFragment extends Fragment implements AsyncArtistCallb
         return view;
     }
 
-    @Override
-    public void onComplete(final List<Artist> artists) {
-        artistsAdapter = new ArtistsAdapter(getActivity(), 0, artists);
+    /**
+     * load a list view after async task and if has a saved instance
+     */
+    public void onComplete() {
+        if (artistes.size() == 0) {
+            Toast.makeText(getActivity(), "No results found. Try different keyword.", Toast.LENGTH_SHORT).show();
+        }
+        artistsAdapter = new ArtistsAdapter(getActivity(), 0, artistes);
 
         ListView listView = (ListView) mainView.findViewById(R.id.artistListView);
         listView.setAdapter(artistsAdapter);
@@ -60,9 +98,48 @@ public class ArtistActivityFragment extends Fragment implements AsyncArtistCallb
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Artist artist = (Artist) artistsAdapter.getItem(position);
-
+                Artiste artiste = (Artiste) artistsAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), TopTrackActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, new String[]{artiste.name, artiste.id});
+                startActivity(intent);
             }
         });
+
+    }
+
+    public boolean isConnected(){
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        } else {
+            Toast.makeText(getActivity(), "Check your connection.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+    private class SearchArtistTask extends AsyncTask<String, Void, ArrayList<Artiste>> {
+
+        @Override
+        protected ArrayList<Artiste> doInBackground(String... params) {
+
+            SpotifyApi api = new SpotifyApi();
+            SpotifyService spotify = api.getService();
+            ArtistsPager results = spotify.searchArtists(params[0]);
+
+            artistes = null;
+            artistes = new ArrayList<>();
+            for (Artist artist : results.artists.items) {
+                artistes.add(new Artiste(artist));
+            }
+
+            return artistes;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Artiste> artistes) {
+            onComplete();
+        }
     }
 }
