@@ -2,6 +2,8 @@ package co.rytikov.spotifystreamer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -33,6 +35,11 @@ public class ArtistActivityFragment extends Fragment {
     private SearchView artistSearch;
     private ArtistsAdapter artistsAdapter;
     private ArrayList<Artiste> artistes;
+
+    public interface Callback {
+
+        void onItemSelected(String[] data);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,9 +106,8 @@ public class ArtistActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Artiste artiste = (Artiste) artistsAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), TopTrackActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, new String[]{artiste.name, artiste.id});
-                startActivity(intent);
+                String[] data = new String[]{artiste.name, artiste.id};
+                ((Callback) getActivity()).onItemSelected(data);
             }
         });
 

@@ -1,17 +1,25 @@
 package co.rytikov.spotifystreamer;
 
+import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class ArtistActivity extends ActionBarActivity {
+public class ArtistActivity extends ActionBarActivity implements ArtistActivityFragment.Callback {
+
+    private boolean mDualPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist);
+
+        if (findViewById(R.id.top_track_layout) != null) {
+            mDualPane = true;
+        }
     }
 
     @Override
@@ -34,5 +42,27 @@ public class ArtistActivity extends ActionBarActivity {
         // }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemSelected(String[] data) {
+
+        if (mDualPane) {
+
+            Fragment fragment = new TopTrackActivityFragment();
+            Bundle args = new Bundle();
+            args.putStringArray("index", data);
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.top_track_layout, fragment)
+                    .commit();
+            }
+        else {
+            Intent intent = new Intent(this, TopTrackActivity.class)
+                    .putExtra(Intent.EXTRA_TEXT, data)
+                    .putExtra("dual_pane", mDualPane);
+            startActivity(intent);
+        }
     }
 }

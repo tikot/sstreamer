@@ -27,6 +27,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="co.rytikov.spotifystreamer.ArtistActivity" />
         </activity>
+        <service android:name=".service.MediaPlayerService"/>
+        <receiver android:name=".service.MediaPlayerService$MediaPlayerReceiver" />
+        <activity
+            android:name=".PlayerActivity"
+            android:label="@string/title_activity_player"
+            android:parentActivityName=".TopTrackActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="co.rytikov.spotifystreamer.TopTrackActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -31,14 +32,15 @@ public class TopTrackActivityFragment extends Fragment {
     private View rootView;
     private String[] artist;
     private ArrayList<Track> tracks;
-
-    public TopTrackActivityFragment() {
-    }
+    private boolean dualPane;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList("the_tracks", tracks);
+
+        outState.putStringArray("artist", artist);
+        outState.putBoolean("dual_plane", dualPane);
     }
 
     @Override
@@ -50,19 +52,34 @@ public class TopTrackActivityFragment extends Fragment {
 
         if (savedInstanceState != null ) {
             tracks = savedInstanceState.getParcelableArrayList("the_tracks");
+            artist = savedInstanceState.getStringArray("artist");
+            dualPane = savedInstanceState.getBoolean("dual_plane");
             onCompete();
         }
         else {
             tracks = new ArrayList<>();
         }
 
-        if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT) && tracks.size() == 0) {
+        final int size = tracks.size();
+        if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT) && size == 0) {
             artist = intent.getStringArrayExtra(Intent.EXTRA_TEXT);
-            if (isConnected())
-                new TopTrackTask().execute(artist[1]);
+            dualPane = intent.getBooleanExtra("dual_pane", false);
+            newSync();
+        }
+
+        Bundle arguments = getArguments();
+        if (arguments != null && size == 0) {
+            artist = arguments.getStringArray("index");
+            dualPane = true;
+            newSync();
         }
 
         return rootView;
+    }
+
+    private void newSync() {
+        if (isConnected())
+            new TopTrackTask().execute(artist[1]);
     }
 
     public void onCompete() {
@@ -72,9 +89,27 @@ public class TopTrackActivityFragment extends Fragment {
 
         TracksAdapter tracksAdapter = new TracksAdapter(getActivity(), 0, tracks);
 
-
         ListView listView = (ListView) rootView.findViewById(R.id.top_track_list_view);
         listView.setAdapter(tracksAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if (dualPane) {
+                    PlayerActivityFragment newFragment = PlayerActivityFragment
+                            .newInstance(position, artist[0], tracks);
+                    newFragment.show(getActivity().getSupportFragmentManager(), "dialog");
+                }
+                else {
+                    Intent intent = new Intent(getActivity(), PlayerActivity.class)
+                            .putExtra("position", position)
+                            .putExtra("artist_name", artist[0]) //send in artist name
+                            .putExtra("tracks", tracks);
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     public boolean isConnected() {

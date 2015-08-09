@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:iconifiedByDefault="false"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="false" />
 
     <ListView
         android:layout_width="match_parent"

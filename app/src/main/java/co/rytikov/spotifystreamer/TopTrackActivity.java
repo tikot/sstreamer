@@ -17,7 +17,7 @@ public class TopTrackActivity extends AppCompatActivity {
 
         // get intent form ArtistActivity
         Intent intent = getIntent();
-        if (intent != null & intent.hasExtra(Intent.EXTRA_TEXT)) {
+        if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             String[] artist = intent.getStringArrayExtra(Intent.EXTRA_TEXT);
             ActionBar actionBar = getSupportActionBar();
             actionBar.setSubtitle(artist[0]);
