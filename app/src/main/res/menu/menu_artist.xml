@@ -1,9 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".ArtistActivity">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ArtistActivity">
     <item android:id="@+id/now_playing"
-        android:icon="@drawable/ic_play_circle_outline_black_48dp"
-        android:orderInCategory="100"
-        app:showAsAction="always"
+        android:icon="@drawable/ic_play_circle_outline_white_48dp"
+        android:showAsAction="ifRoom"
         android:title="Now Playing" />
 </menu>
+
+

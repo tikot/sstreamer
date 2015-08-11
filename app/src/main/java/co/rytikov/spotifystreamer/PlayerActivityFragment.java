@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -59,15 +59,22 @@ public class PlayerActivityFragment extends DialogFragment {
      * @param position int
      * @param artistName String
      * @param tracks ArrayList
-     * @return new fragment
+     * @return liveView
      */
-    public static PlayerActivityFragment newInstance(int position, String artistName, ArrayList<Track> tracks) {
+    public static PlayerActivityFragment newInstance(int position, String artistName,
+                                                     ArrayList<Track> tracks) {
+        return newInstance(position, artistName, tracks, false);
+    }
+
+    public static PlayerActivityFragment newInstance(int position, String artistName,
+                                                     ArrayList<Track> tracks, boolean saved) {
         PlayerActivityFragment fragment = new PlayerActivityFragment();
 
         Bundle args = new Bundle();
         args.putInt("position", position);
         args.putString("artist_name", artistName);
         args.putParcelableArrayList("tracks", tracks);
+        args.putBoolean("saved_state", saved);
         fragment.setArguments(args);
 
         return fragment;
@@ -79,6 +86,7 @@ public class PlayerActivityFragment extends DialogFragment {
 
         Intent serviceIntent = new Intent(getActivity(), MediaPlayerService.class);
         Bundle bundle = getArguments();
+        Boolean saved = false;
 
         if (savedInstanceState != null) {
             position = savedInstanceState.getInt("position");
@@ -87,18 +95,24 @@ public class PlayerActivityFragment extends DialogFragment {
 
             maxDuration = savedInstanceState.getInt("max_duration");
 
-            serviceIntent.putExtra("saved_state", true);
+            saved = true;
         }
         else {
             if (bundle != null) {
                 position = bundle.getInt("position");
                 artist_name = bundle.getString("artist_name");
                 tracks = bundle.getParcelableArrayList("tracks");
+                saved = bundle.getBoolean("saved_state");
             }
+        }
+
+        if (saved) {
+            serviceIntent.putExtra("saved_state", true);
         }
 
         // setup and start Media Service
         serviceIntent.putExtra("position", position);
+        serviceIntent.putExtra("artist_name", artist_name);
         serviceIntent.putParcelableArrayListExtra("tracks", tracks);
 
         getActivity().startService(serviceIntent);
@@ -181,7 +195,7 @@ public class PlayerActivityFragment extends DialogFragment {
             updateView();
 
             // change the play button
-            playButton.setImageResource(android.R.drawable.ic_media_pause);
+            changeToPause();
             setDuration();
         }
     };
@@ -196,7 +210,7 @@ public class PlayerActivityFragment extends DialogFragment {
             currentTime.setText(getTimeFormat(current));
 
             if (!is_playing) {
-                playButton.setImageResource(android.R.drawable.ic_media_play);
+                changeToPlay();
             }
         }
 
@@ -261,10 +275,10 @@ public class PlayerActivityFragment extends DialogFragment {
                 LocalBroadcastManager.getInstance(listView.getContext())
                         .sendBroadcast(sendIntent);
                 if (is_playing) {
-                    playButton.setImageResource(android.R.drawable.ic_media_play);
+                    changeToPlay();
                 }
                 else {
-                    playButton.setImageResource(android.R.drawable.ic_media_pause);
+                    changeToPause();
                 }
             }
         });
@@ -277,7 +291,7 @@ public class PlayerActivityFragment extends DialogFragment {
                 LocalBroadcastManager.getInstance(listView.getContext())
                         .sendBroadcast(sendIntent);
 
-                playButton.setImageResource(android.R.drawable.ic_media_pause);
+                changeToPause();
             }
         });
 
@@ -289,8 +303,16 @@ public class PlayerActivityFragment extends DialogFragment {
                 LocalBroadcastManager.getInstance(listView.getContext())
                         .sendBroadcast(sendIntent);
 
-                playButton.setImageResource(android.R.drawable.ic_media_pause);
+                changeToPause();
             }
         });
+    }
+
+    private void changeToPause() {
+        playButton.setImageResource(R.drawable.ic_pause_circle_48dp);
+    }
+
+    private void changeToPlay() {
+        playButton.setImageResource(R.drawable.ic_play_circle_48dp);
     }
 }

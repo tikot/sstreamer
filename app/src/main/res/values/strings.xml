@@ -5,4 +5,9 @@
     <string name="title_activity_top_track">Top Ten Tracks</string>
     <string name="title_activity_player">@string/app_name</string>
     <string name="local_service_started">testing this</string>
+
+    <string name="no_now_playing">Music is not playing, try searching for music.</string>
+    <string name="no_results">No results found. Try different keyword.</string>
+    <string name="no_track">No tracks found.</string>
+    <string name="check_connection">Check your connection.</string>
 </resources>

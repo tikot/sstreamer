@@ -1,13 +1,11 @@
 package co.rytikov.spotifystreamer;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
+
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,7 +93,7 @@ public class ArtistActivityFragment extends Fragment {
      */
     public void onComplete() {
         if (artistes.size() == 0) {
-            Toast.makeText(getActivity(), "No results found. Try different keyword.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.no_results, Toast.LENGTH_SHORT).show();
         }
         artistsAdapter = new ArtistsAdapter(getActivity(), 0, artistes);
 
@@ -120,7 +118,7 @@ public class ArtistActivityFragment extends Fragment {
         if (networkInfo != null && networkInfo.isConnected()) {
             return true;
         } else {
-            Toast.makeText(getActivity(), "Check your connection.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_SHORT).show();
             return false;
         }
     }

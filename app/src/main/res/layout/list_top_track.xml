@@ -3,7 +3,7 @@
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:padding="16dp" >
+    android:padding="@dimen/default_padding" >
 
     <ImageView
         android:layout_width="72dp"
@@ -16,20 +16,22 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:padding="@dimen/default_padding">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/track_name"
-            android:textSize="17dp"
+            android:textColor="@color/primary_text"
+            android:textSize="17sp"
             android:text="Track Name" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/album_name"
-            android:textSize="12dp"
+            android:textColor="@color/secondary_text"
+            android:textSize="12sp"
             android:text="Album Name" />
 
     </LinearLayout>

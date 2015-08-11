@@ -24,13 +24,15 @@ import co.rytikov.spotifystreamer.models.Track;
 public class MediaPlayerService extends Service {
 
     private boolean amRunning = false;
+    private boolean recover = false;
+    private String artist_name;
     private MediaPlayer mediaPlayer;
-    private int position;
-    private ArrayList tracks;
+    private ArrayList<Track> tracks;
 
     public static String MEDIA_PLAYER_TIME = "media-player-time";
     public static String CURRENT_TRACK = "current-track";
     public static String MEDIA_CONTROLLERS = "media-controllers";
+    public static String RECOVER_PLAYER = "recover-player";
 
     /**
      * for broadcast
@@ -38,6 +40,9 @@ public class MediaPlayerService extends Service {
     private Intent currentTrack;
     private Intent timeIntent;
     private Handler handler = new Handler();
+
+    private int position;
+    private int maxDuration;
 
     @Override
     public void onCreate() {
@@ -56,8 +61,36 @@ public class MediaPlayerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        /**
+         * for recovering Now Playing view
+         */
+        if (amRunning && intent.getBooleanExtra("recovery", false)) {
+            Intent rIntent = new Intent(RECOVER_PLAYER);
+            rIntent.putExtra("position", position);
+            rIntent.putExtra("artist_name", artist_name);
+            rIntent.putParcelableArrayListExtra("tracks", tracks);
+
+            LocalBroadcastManager.getInstance(getApplicationContext())
+                    .sendBroadcast(rIntent);
+
+            recover = true;
+
+            return super.onStartCommand(intent, flags, startId);
+        }
+        else {
+            if (intent.getBooleanExtra("recovery", false)) {
+                Intent rIntent = new Intent(RECOVER_PLAYER);
+                rIntent.putExtra("not-running", true);
+                LocalBroadcastManager.getInstance(getApplicationContext())
+                        .sendBroadcast(rIntent);
+                stopSelf();
+                return super.onStartCommand(intent, flags, startId);
+            }
+        }
+
         if (intent.hasExtra("position") && intent.hasExtra("tracks")) {
             position = intent.getIntExtra("position", 0);
+            artist_name = intent.getStringExtra("artist_name");
             tracks = intent.getParcelableArrayListExtra("tracks");
         }
 
@@ -66,11 +99,19 @@ public class MediaPlayerService extends Service {
             amRunning = true;
         }
 
+        /**
+         * make sure duration is sent to a new view
+         */
+        if (recover) {
+            recover = false;
+            sendDuration(maxDuration);
+        }
+
         return super.onStartCommand(intent, flags, startId);
     }
 
     private void updateMedia() {
-        Track track = (Track) tracks.get(position);
+        Track track = tracks.get(position);
 
         mediaPlayer.reset();
 
@@ -89,24 +130,26 @@ public class MediaPlayerService extends Service {
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-                int mDuration = mediaPlayer.getDuration();
+                maxDuration = mediaPlayer.getDuration();
 
-                currentTrack.putExtra("duration", mDuration);
-                currentTrack.putExtra("position", position);
-                LocalBroadcastManager.getInstance(getApplicationContext())
-                        .sendBroadcast(currentTrack);
+                sendDuration(maxDuration);
 
                 handler.postDelayed(seekRun, 100);
 
                 mediaPlayer.start();
             }
         });
-        mediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
-            @Override
-            public void onBufferingUpdate(MediaPlayer mp, int percent) {
+    }
 
-            }
-        });
+    /**
+     * Broadcasting duration of a current track
+     * @param duration time in milliseconds
+     */
+    private void sendDuration(int duration) {
+        currentTrack.putExtra("duration", duration);
+        currentTrack.putExtra("position", position);
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .sendBroadcast(currentTrack);
     }
 
     private Runnable seekRun = new Runnable() {

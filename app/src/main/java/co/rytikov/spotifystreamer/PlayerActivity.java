@@ -1,9 +1,9 @@
 package co.rytikov.spotifystreamer;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.v7.app.AppCompatActivity;
+
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import co.rytikov.spotifystreamer.models.Track;
 
 
-public class PlayerActivity extends AppCompatActivity {
+public class PlayerActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,10 +25,12 @@ public class PlayerActivity extends AppCompatActivity {
             int position = intent.getIntExtra("position", 0);
             String artist_name = intent.getStringExtra("artist_name");
             ArrayList<Track> tracks = intent.getParcelableArrayListExtra("tracks");
+            boolean saved = intent.getBooleanExtra("saved_state", false);
 
             PlayerActivityFragment playerFragment = PlayerActivityFragment.newInstance(position,
-                    artist_name, tracks);
-            getSupportFragmentManager().beginTransaction()
+                    artist_name, tracks, saved);
+
+            getFragmentManager().beginTransaction()
                     .replace(R.id.top_track_layout, playerFragment)
                     .commit();
         }

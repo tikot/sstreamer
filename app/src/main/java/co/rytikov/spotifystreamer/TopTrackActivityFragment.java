@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +33,16 @@ public class TopTrackActivityFragment extends Fragment {
     private String[] artist;
     private ArrayList<Track> tracks;
     private boolean dualPane;
+
+    public static TopTrackActivityFragment newInstance(String[] data) {
+
+        Bundle args = new Bundle();
+        args.putStringArray("index", data);
+
+        TopTrackActivityFragment fragment = new TopTrackActivityFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -84,12 +94,12 @@ public class TopTrackActivityFragment extends Fragment {
 
     public void onCompete() {
         if (tracks.size() == 0) {
-            Toast.makeText(getActivity(), "No tracks found.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.no_track, Toast.LENGTH_SHORT).show();
         }
 
         TracksAdapter tracksAdapter = new TracksAdapter(getActivity(), 0, tracks);
 
-        ListView listView = (ListView) rootView.findViewById(R.id.top_track_list_view);
+        ListView listView = (ListView) rootView;
         listView.setAdapter(tracksAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -99,7 +109,7 @@ public class TopTrackActivityFragment extends Fragment {
                 if (dualPane) {
                     PlayerActivityFragment newFragment = PlayerActivityFragment
                             .newInstance(position, artist[0], tracks);
-                    newFragment.show(getActivity().getSupportFragmentManager(), "dialog");
+                    newFragment.show(getActivity().getFragmentManager(), "dialog");
                 }
                 else {
                     Intent intent = new Intent(getActivity(), PlayerActivity.class)
@@ -119,7 +129,7 @@ public class TopTrackActivityFragment extends Fragment {
         if (networkInfo != null && networkInfo.isConnected()) {
             return true;
         } else {
-            Toast.makeText(getActivity(), "Check your connection.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_SHORT).show();
             return false;
         }
     }

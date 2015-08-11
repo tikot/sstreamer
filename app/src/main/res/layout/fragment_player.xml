@@ -13,7 +13,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:padding="@dimen/default_padding"
         android:background="@color/white_t">
 
         <TextView
@@ -35,7 +35,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primary_t"
+        android:background="@color/white_t"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -52,8 +52,8 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
+            android:paddingLeft="@dimen/default_padding"
+            android:paddingRight="@dimen/default_padding"
             android:layout_gravity="center_horizontal"
             android:layout_below="@+id/seek_track">
 
@@ -62,7 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/primary_text"
-                android:textSize="13sp"/>
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/track_name"
@@ -88,22 +88,21 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical|center_horizontal"
             android:paddingTop="8dp"
-            android:paddingBottom="16dp"
+            android:paddingBottom="@dimen/default_padding"
             android:orientation="horizontal">
 
             <ImageButton
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:background="@null"
-                android:src="@android:drawable/ic_media_previous"
+                android:src="@drawable/ic_skip_previous_black_48dp"
                 android:id="@+id/previous_button" />
 
             <ImageButton
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:background="@drawable/round_button"
-                android:paddingLeft="0dp"
-                android:src="@android:drawable/ic_media_play"
+                android:background="@null"
+                android:src="@drawable/ic_play_circle_48dp"
                 android:gravity="center"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
@@ -113,7 +112,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:background="@null"
-                android:src="@android:drawable/ic_media_next"
+                android:src="@drawable/ic_skip_next_black_48dp"
                 android:id="@+id/next_button"/>
 
         </LinearLayout>

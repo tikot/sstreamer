@@ -1,14 +1,14 @@
 package co.rytikov.spotifystreamer;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.ActionBar;
+import android.app.ActionBar;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class TopTrackActivity extends AppCompatActivity {
+public class TopTrackActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +19,7 @@ public class TopTrackActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             String[] artist = intent.getStringArrayExtra(Intent.EXTRA_TEXT);
-            ActionBar actionBar = getSupportActionBar();
+            ActionBar actionBar = getActionBar();
             actionBar.setSubtitle(artist[0]);
         }
     }
